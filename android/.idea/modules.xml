@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/flutter_scanner_plugin.iml" filepath="$PROJECT_DIR$/.idea/modules/flutter_scanner_plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/br.com.igguerra.flutter_scanner_plugin.flutter_scanner_plugin.iml" filepath="$PROJECT_DIR$/.idea/modules/br.com.igguerra.flutter_scanner_plugin.flutter_scanner_plugin.iml" />
     </modules>
   </component>
 </project>

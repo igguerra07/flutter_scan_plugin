@@ -17,7 +17,7 @@ import io.flutter.plugin.common.PluginRegistry
 class FlutterScannerPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry.ActivityResultListener {
 
   private lateinit var channel : MethodChannel
-  private lateinit var activity: Activity
+  private var activity: Activity? = null
   private lateinit var pendingResult: Result
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -31,11 +31,10 @@ class FlutterScannerPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plu
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     when(call.method) {
-
       QR_CODE_METHOD -> {
         pendingResult = result
         val intent = Intent(activity, ScannerActivity::class.java)
-        activity.startActivityForResult(intent, DUMMY_REQUEST_CODE)
+        activity?.startActivityForResult(intent, DUMMY_REQUEST_CODE)
       }
 
       else -> result.notImplemented()
@@ -44,7 +43,7 @@ class FlutterScannerPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plu
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
     val result = IntentIntegrator.parseActivityResult(resultCode, data)
-    if (result != null) {
+    if (result != null && data != null) {
       pendingResult.success(result.contents)
       return true
     }
@@ -61,7 +60,9 @@ class FlutterScannerPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plu
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
 
-  override fun onDetachedFromActivity() {}
+  override fun onDetachedFromActivity() {
+    activity = null
+  }
 
   companion object {
     private const val CHANNEL_NAME = "flutter_scanner_plugin"
