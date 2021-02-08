@@ -42,12 +42,15 @@ class FlutterScannerPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plu
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-    val result = IntentIntegrator.parseActivityResult(resultCode, data)
-    if (result != null && data != null) {
-      pendingResult.success(result.contents)
-      return true
+    if(requestCode != 2343) {
+      val result = IntentIntegrator.parseActivityResult(resultCode, data)
+      if (result != null && data != null) {
+        pendingResult.success(result.contents)
+        return true
+      }
+      pendingResult.success("Não veio valor")
+      return false
     }
-    pendingResult.success("Não veio valor")
     return false
   }
 
