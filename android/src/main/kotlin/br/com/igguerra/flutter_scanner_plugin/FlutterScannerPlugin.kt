@@ -5,8 +5,6 @@ import android.content.Intent
 import androidx.annotation.NonNull
 import com.google.zxing.integration.android.IntentIntegrator
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.embedding.engine.plugins.activity.ActivityAware
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -14,7 +12,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry
 
 /** FlutterScannerPlugin */
-class FlutterScannerPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry.ActivityResultListener {
+class FlutterScannerPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityResultListener {
 
   private lateinit var channel : MethodChannel
   private var activity: Activity? = null
@@ -42,29 +40,16 @@ class FlutterScannerPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plu
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-    if(requestCode != 2343) {
       val result = IntentIntegrator.parseActivityResult(resultCode, data)
       if (result != null && data != null) {
-        pendingResult.success(result.contents)
-        return true
+        if (resultCode == Activity.RESULT_OK) {
+          pendingResult.success(result.contents)
+          return true
+        }
+        return false
       }
       pendingResult.success("Não veio valor")
       return false
-    }
-    return false
-  }
-
-  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    activity = binding.activity
-    binding.addActivityResultListener(this)
-  }
-
-  override fun onDetachedFromActivityForConfigChanges() {}
-
-  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
-
-  override fun onDetachedFromActivity() {
-    activity = null
   }
 
   companion object {
