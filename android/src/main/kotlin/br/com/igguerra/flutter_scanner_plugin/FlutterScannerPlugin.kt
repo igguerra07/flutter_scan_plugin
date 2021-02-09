@@ -34,7 +34,7 @@ class FlutterScannerPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plu
       QR_CODE_METHOD -> {
         pendingResult = result
         val intent = Intent(activity, ScannerActivity::class.java)
-        activity?.startActivityForResult(intent, IntentIntegrator.REQUEST_CODE)
+        activity.startActivityForResult(intent, IntentIntegrator.REQUEST_CODE)
       }
       else -> result.notImplemented()
     }
@@ -46,7 +46,7 @@ class FlutterScannerPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plu
         val result = IntentIntegrator.parseActivityResult(resultCode, data)
         pendingResult.success(result.contents);
       } else {
-        pendingResult.success("");
+        pendingResult.success(EMPTY_CHAR);
       }
       return true;
     }
@@ -67,6 +67,7 @@ class FlutterScannerPlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plu
   companion object {
     private const val CHANNEL_NAME = "flutter_scanner_plugin"
     private const val QR_CODE_METHOD = "qrCodeScan"
+    private const val EMPTY_CHAR = ""
   }
 }
 

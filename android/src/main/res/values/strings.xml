@@ -1,1 +1,4 @@
-<resources></resources>
+<resources>
+    <string name="turn_on_flashlight">Ligar lanterna</string>
+    <string name="turn_off_flashlight">Desligar lanterna</string>
+</resources>
