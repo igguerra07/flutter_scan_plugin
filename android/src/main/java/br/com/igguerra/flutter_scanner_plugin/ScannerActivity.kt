@@ -2,11 +2,13 @@ package br.com.igguerra.flutter_scanner_plugin
 
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
-import android.widget.Button
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.journeyapps.barcodescanner.CaptureManager
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import com.journeyapps.barcodescanner.DecoratedBarcodeView.TorchListener
@@ -17,30 +19,32 @@ class ScannerActivity : AppCompatActivity(), TorchListener {
     private lateinit var capture: CaptureManager
     private lateinit var barcodeScannerView: DecoratedBarcodeView
     private lateinit var viewFinderView : ViewfinderView
-    private lateinit var switchFlashlightButton : Button
-    private var flashLightState: String? = null
+    private lateinit var switchFlashlightButton : FloatingActionButton
+    private lateinit var switchFlashlightIcon : ImageView
+    private var isFlashlightOn: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_scanner)
 
-        flashLightState = if (savedInstanceState != null) {
-            savedInstanceState.getString(FLASH_STATE) ?: getString(R.string.turn_on_flashlight)
-        } else {
-            getString(R.string.turn_on_flashlight)
-        }
-2
+        if (savedInstanceState != null) isFlashlightOn = savedInstanceState.getBoolean(FLASH_STATE)
+
+        switchFlashlightButton = findViewById(R.id.floatingFlashButton)
+        switchFlashlightIcon = findViewById(R.id.flashIconButton)
+        viewFinderView = findViewById(R.id.zxing_viewfinder_view)
         barcodeScannerView = findViewById(R.id.zxing_barcode_scanner)
+
+        barcodeScannerView.setStatusText("")
         barcodeScannerView.setTorchListener(this)
-
-        switchFlashlightButton = findViewById(R.id.switch_flashlight)
-
-        switchFlashlightButton.text = flashLightState
 
         switchFlashlightButton.setOnClickListener { switchFlashlight() }
 
-        viewFinderView = findViewById(R.id.zxing_viewfinder_view)
+        if (isFlashlightOn) {
+            switchFlashlightIcon.setImageResource(R.drawable.ic_flashlight_off)
+        } else {
+            switchFlashlightIcon.setImageResource(R.drawable.ic_flashlight_on)
+        }
 
         if (!hasFlash()) switchFlashlightButton.visibility = View.GONE
 
@@ -50,6 +54,8 @@ class ScannerActivity : AppCompatActivity(), TorchListener {
         capture.decode()
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+
+        changeViewFinderColor()
     }
 
     private fun hasFlash(): Boolean {
@@ -58,11 +64,16 @@ class ScannerActivity : AppCompatActivity(), TorchListener {
     }
 
     private fun switchFlashlight() {
-        if(switchFlashlightButton.text == getString(R.string.turn_off_flashlight)) {
+        if(isFlashlightOn) {
             barcodeScannerView.setTorchOff()
         } else {
             barcodeScannerView.setTorchOn()
         }
+    }
+
+    private fun changeViewFinderColor() {
+        val color  = Color.argb(200,0, 0, 0)
+        viewFinderView.setMaskColor(color)
     }
 
     override fun onResume() {
@@ -82,7 +93,7 @@ class ScannerActivity : AppCompatActivity(), TorchListener {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(FLASH_STATE, switchFlashlightButton.text.toString())
+        outState.putBoolean(FLASH_STATE, isFlashlightOn)
         capture.onSaveInstanceState(outState)
     }
 
@@ -95,11 +106,13 @@ class ScannerActivity : AppCompatActivity(), TorchListener {
     }
 
     override fun onTorchOn() {
-        switchFlashlightButton.text = getString(R.string.turn_off_flashlight)
+        isFlashlightOn = true
+        switchFlashlightIcon.setImageResource(R.drawable.ic_flashlight_off)
     }
 
     override fun onTorchOff() {
-        switchFlashlightButton.text = getString(R.string.turn_on_flashlight)
+        isFlashlightOn = false
+        switchFlashlightIcon.setImageResource(R.drawable.ic_flashlight_on)
     }
 
     companion object {
